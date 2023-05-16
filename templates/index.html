@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Rental Property Yield Calculator</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Rental Property Yield Calculator</h1>
+    <form id="yieldForm">
+        <div class="form-row">
+            <div class="form-group col-mb-6">
+                <label for="purchasePrice">Purchase Price:</label>
+                <input class="form-control format-number default-input" type="text" id="purchasePrice" name="purchasePrice" value="100000" required>
+            </div>
+
+            <div class="form-group col-mb-6">
+                <label for="depositPercentage">Deposit Percentage:</label>
+                <input class="form-control format-number default-input" type="text" id="depositPercentage" name="depositPercentage" value="25" required>
+            </div>
+
+            <div class="form-group col-mb-6">
+                <label for="mortgageRate">Mortgage Rate:</label>
+                <input class="form-control format-number default-input" type="text" id="mortgageRate" name="mortgageRate" value="6" required>
+            </div>
+
+            <div class="form-group col-mb-6">
+                <label for="mortgagePeriod">Mortgage Period (Years):</label>
+                <input class="form-control format-number default-input" type="text" id="mortgagePeriod" name="mortgagePeriod" value="25" required>
+            </div>
+
+            <div class="form-group col-mb-6">
+                <label for="taxPercentage">Corporate Tax Percentage:</label>
+                <input class="form-control format-number default-input" type="text" id="taxPercentage" name="taxPercentage" value="19" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-mb-6">
+                <label for="maintenanceFeePercentage">Maintenance Fee (% of Rent):</label>
+                <input class="form-control format-number default-input" type="text" id="maintenanceFeePercentage" name="maintenanceFeePercentage" value="10" required>
+            </div>
+
+            <div class="form-group col-mb-6">
+                <label for="monthlyRent">Monthly Rent:</label>
+                <input class="form-control format-number default-input" type="text" id="monthlyRent" name="monthlyRent" value="1200" required>
+            </div>
+
+            <div class="form-group col-mb-6">
+                <label for="refurbishmentCost">Refurbishment Price:</label>
+                <input class="form-control format-number default-input" type="text" id="refurbishmentCost" name="refurbishmentCost" value="10000" required>
+            </div>
+
+            <div class="form-group col-mb-6">
+                <label for="legalFees">Legal Fees:</label>
+                <input class="form-control format-number default-input" type="text" id="legalFees" name="legalFees" value="1000" required>
+            </div>
+
+            <div class="form-group col-mb-6">
+                <label for="otherAnnualExpenses">Other Annual Expenses:</label>
+                <input class="form-control format-number default-input" type="text" id="otherAnnualExpenses" name="otherAnnualExpenses" value="1000" required>
+            </div>
+        </div>
+
+      <button type="submit" id="calculateYield">Calculate Yield</button>
+    </form>
+    <div id="yieldResults" style="display: none;">
+      <h3 style="text-align: center;">Yield Results</h3>
+      <!-- <div id="graphContainer"></div> Uncomment this to show graph -->
+
+      <h4 style="text-align: left;">Amounts</h4>
+      <div id="resultsContainer"></div>
+
+      <h4 style="text-align: left;">Incomes</h4>
+      <div id="resultsContainer2"></div>
+
+      <h4 style="text-align: left;">Expenditures</h4>
+      <div id="resultsContainer3"></div>
+
+      <h4 style="text-align: left;">Yields</h4>
+      <div id="resultsContainer4"></div>
+    </div>
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('#yieldForm').submit(function(event) {
+        event.preventDefault();
+
+        // Retrieve input values from the form
+        var purchasePrice = $('#purchasePrice').val();
+        var depositPercentage = $('#depositPercentage').val();
+        var mortgageRate = $('#mortgageRate').val();
+        var mortgagePeriod = $('#mortgagePeriod').val();
+        var taxPercentage = $('#taxPercentage').val();
+        var maintenanceFeePercentage = $('#maintenanceFeePercentage').val();
+        var monthlyRent = $('#monthlyRent').val();
+        var refurbishmentCost = $('#refurbishmentCost').val();
+        var legalFees = $('#legalFees').val();
+        var otherAnnualExpenses = $('#otherAnnualExpenses').val();
+
+        // Send AJAX request to calculate the yield
+        $.ajax({
+          type: 'POST',
+          url: '/calculate_yield',
+          data: {
+              'purchasePrice': purchasePrice,
+              'depositPercentage': depositPercentage,
+              'mortgageRate': mortgageRate,
+              'mortgagePeriod': mortgagePeriod,
+              'taxPercentage': taxPercentage,
+              'maintenanceFeePercentage': maintenanceFeePercentage,
+              'monthlyRent': monthlyRent,
+              'refurbishmentCost': refurbishmentCost,
+              'legalFees': legalFees,
+              'otherAnnualExpenses': otherAnnualExpenses
+          },
+          success: function(response) {
+            // Display the yield results
+            $('#yieldResults').show();
+
+            // Display the graph
+            var graphContainer = $('#graphContainer');
+            graphContainer.empty();
+            $('<img>').attr('src', 'data:image/png;base64,' + response.graphData).appendTo(graphContainer);
+
+            // Display the results
+            var resultsContainer = $('#resultsContainer');
+            resultsContainer.empty();
+
+            var depositColumn = $('<div class="resultColumn">')
+            $('<p class="resultLabel">Deposit Amount</p>').appendTo(depositColumn);
+            $('<p class="resultValue">£'+response.depositAmount.toLocaleString()+'</p></div>').appendTo(depositColumn);
+            depositColumn.appendTo(resultsContainer);
+
+            var mortgageAmountColumn = $('<div class="resultColumn">')
+            $('<p class="resultLabel">Mortgage Amount</p>').appendTo(mortgageAmountColumn);
+            $('<p class="resultValue">£'+response.mortgageAmount.toLocaleString()+'</p></div>').appendTo(mortgageAmountColumn);
+            mortgageAmountColumn.appendTo(resultsContainer);
+
+            var stampDutyColumn = $('<div class="resultColumn">')
+            $('<p class="resultLabel">Stamp Duty</p>').appendTo(stampDutyColumn);
+            $('<p class="resultValue">£'+response.stampDuty.toLocaleString()+'</p></div>').appendTo(stampDutyColumn);
+            stampDutyColumn.appendTo(resultsContainer);
+
+            var refurbishmentColumn = $('<div class="resultColumn">')
+            $('<p class="resultLabel">Refurbishment Cost</p>').appendTo(refurbishmentColumn);
+            $('<p class="resultValue">£'+response.refurbishmentCost.toLocaleString()+'</p></div>').appendTo(refurbishmentColumn);
+            refurbishmentColumn.appendTo(resultsContainer);
+
+            var legalFeesColumn = $('<div class="resultColumn">')
+            $('<p class="resultLabel">Legal Fees</p>').appendTo(legalFeesColumn);
+            $('<p class="resultValue">£'+response.legalFees.toLocaleString()+'</p></div>').appendTo(legalFeesColumn);
+            legalFeesColumn.appendTo(resultsContainer);
+
+            var totalInitialInvestmentColumn = $('<div class="resultColumn">')
+            $('<p class="resultLabel">Total Initial Investment</p>').appendTo(totalInitialInvestmentColumn);
+            $('<p class="resultValue">£'+response.totalInitialInvestment.toLocaleString()+'</p></div>').appendTo(totalInitialInvestmentColumn);
+            totalInitialInvestmentColumn.appendTo(resultsContainer);
+
+            // Display the results
+            var resultsContainer2 = $('#resultsContainer2');
+            resultsContainer2.empty();
+
+            var annualRentColumn = $('<div class="resultColumn">')
+            $('<p class="resultLabel">Annual Rent</p>').appendTo(annualRentColumn);
+            $('<p class="resultValue">£'+response.annualRent.toLocaleString()+'</p></div>').appendTo(annualRentColumn);
+            annualRentColumn.appendTo(resultsContainer2);
+
+            var grossAnnualProfitColumn = $('<div class="resultColumn">')
+            $('<p class="resultLabel">Gross Annual Profit</p>').appendTo(grossAnnualProfitColumn);
+            $('<p class="resultValue">£'+response.grossAnnualProfit.toLocaleString()+'</p></div>').appendTo(grossAnnualProfitColumn);
+            grossAnnualProfitColumn.appendTo(resultsContainer2);
+
+            var netAnnualProfitBeforeTaxColumn = $('<div class="resultColumn">')
+            $('<p class="resultLabel">Net Annual Profit Before Tax</p>').appendTo(netAnnualProfitBeforeTaxColumn);
+            $('<p class="resultValue">£'+response.netAnnualProfitBeforeTax.toLocaleString()+'</p></div>').appendTo(netAnnualProfitBeforeTaxColumn);
+            netAnnualProfitBeforeTaxColumn.appendTo(resultsContainer2);
+
+            var netAnnualProfitAfterTaxColumn = $('<div class="resultColumn">')
+            $('<p class="resultLabel">Net Annual Profit After Tax</p>').appendTo(netAnnualProfitAfterTaxColumn);
+            $('<p class="resultValue">£'+response.netAnnualProfitAfterTax.toLocaleString()+'</p></div>').appendTo(netAnnualProfitAfterTaxColumn);
+            netAnnualProfitAfterTaxColumn.appendTo(resultsContainer2);
+
+            var monthlyRentColumn = $('<div class="resultColumn">')
+            $('<p class="resultLabel">Monthly Rent</p>').appendTo(monthlyRentColumn);
+            $('<p class="resultValue">£'+response.monthlyRent.toLocaleString()+'</p></div>').appendTo(monthlyRentColumn);
+            monthlyRentColumn.appendTo(resultsContainer2);
+
+            // Display the results
+            var resultsContainer3 = $('#resultsContainer3');
+            resultsContainer3.empty();
+
+            var annualMaintenanceColumn = $('<div class="resultColumn">')
+            $('<p class="resultLabel">Annual Maintenance</p>').appendTo(annualMaintenanceColumn);
+            $('<p class="resultValue">£'+response.annualMaintenance.toLocaleString()+'</p></div>').appendTo(annualMaintenanceColumn);
+            annualMaintenanceColumn.appendTo(resultsContainer3);
+
+            var annualMortgageColumn = $('<div class="resultColumn">')
+            $('<p class="resultLabel">Annual Mortgage</p>').appendTo(annualMortgageColumn);
+            $('<p class="resultValue">£'+response.annualMortgage.toLocaleString()+'</p></div>').appendTo(annualMortgageColumn);
+            annualMortgageColumn.appendTo(resultsContainer3);
+
+            var monthlyMortgageColumn = $('<div class="resultColumn">')
+            $('<p class="resultLabel">Monthly Mortgage Payment</p>').appendTo(monthlyMortgageColumn);
+            $('<p class="resultValue">£'+response.monthlyMortgage.toLocaleString()+'</p></div>').appendTo(monthlyMortgageColumn);
+            monthlyMortgageColumn.appendTo(resultsContainer3);
+
+            var annualExpensesWithoutMortgagePaymentsColumn = $('<div class="resultColumn">')
+            $('<p class="resultLabel">Annual Expenses without Mortgage payments</p>').appendTo(annualExpensesWithoutMortgagePaymentsColumn);
+            $('<p class="resultValue">£'+response.annualExpensesWithoutMortgagePayments.toLocaleString()+'</p></div>').appendTo(annualExpensesWithoutMortgagePaymentsColumn);
+            annualExpensesWithoutMortgagePaymentsColumn.appendTo(resultsContainer3);
+
+            var totalAnnualExpensesColumn = $('<div class="resultColumn">')
+            $('<p class="resultLabel">Total Annual Expenses</p>').appendTo(totalAnnualExpensesColumn);
+            $('<p class="resultValue">£'+response.totalAnnualExpenses.toLocaleString()+'</p></div>').appendTo(totalAnnualExpensesColumn);
+            totalAnnualExpensesColumn.appendTo(resultsContainer3);
+
+            // Display the results
+            var resultsContainer4 = $('#resultsContainer4');
+            resultsContainer4.empty();
+
+            var grossYieldColumn = $('<div class="resultColumn">')
+            $('<p class="resultLabel">Gross Yield</p>').appendTo(grossYieldColumn);
+            $('<p class="resultValue">'+response.grossYield.toLocaleString()+'%</p></div>').appendTo(grossYieldColumn);
+            grossYieldColumn.appendTo(resultsContainer4);
+
+            var netYieldBeforeTaxColumn = $('<div class="resultColumn">')
+            $('<p class="resultLabel">Net Yield Before Tax</p>').appendTo(netYieldBeforeTaxColumn);
+            $('<p class="resultValue">'+response.netYieldBeforeTax.toLocaleString()+'%</p></div>').appendTo(netYieldBeforeTaxColumn);
+            netYieldBeforeTaxColumn.appendTo(resultsContainer4);
+
+            var netYieldAfterTaxColumn = $('<div class="resultColumn">')
+            $('<p class="resultLabel">Net Yield After Tax</p>').appendTo(netYieldAfterTaxColumn);
+            $('<p class="resultValue">'+response.netYieldAfterTax.toLocaleString()+'%</p></div>').appendTo(netYieldAfterTaxColumn);
+            netYieldAfterTaxColumn.appendTo(resultsContainer4);
+            },
+          error: function(xhr, status, error) {
+            console.log('Error:', error);
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

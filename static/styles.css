@@ -1,0 +1,96 @@
+.container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 5px;
+    background-color: oldlace;
+  }
+  
+  h1 {
+    text-align: center;
+  }
+  
+  form {
+    margin-bottom: 10px;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 10px;
+  }
+  
+  input[type="text"] {
+    width: 100%;
+    padding: 5px;
+    font-size: 16px;
+  }
+  
+  button {
+    display: block;
+    margin: 10px 0;
+    padding: 10px 20px;
+    font-size: 16px;
+  }
+  
+  #yieldResults {
+    margin-top: 10px;
+  }
+  
+  #graphContainer img {
+    display: block;
+    max-width: 30%;
+    margin-bottom: 10px;
+  }
+  
+  #resultsContainer {
+    margin-top: 20px;
+    margin-bottom: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    background-color: aliceblue;
+  }
+  
+  #resultsContainer2 {
+    margin-top: 20px;
+    margin-bottom: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    background-color: azure;
+  }
+  
+  #resultsContainer3 {
+    margin-top: 20px;
+    margin-bottom: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    background-color: aliceblue;
+  }
+  
+  #resultsContainer4 {
+    margin-top: 20px;
+    margin-bottom: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    background-color: azure;
+  }
+
+  #resultColumn {
+    flex-basis: calc(10% - 20px);
+    margin-bottom: 20px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+  }
+
+  #resultLabel {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+
+  #resultValue {
+    margin: 0;
+  }
+  

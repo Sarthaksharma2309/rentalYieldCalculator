@@ -1,2 +1,2 @@
 # rentalYieldCalculator
-Simple yield calculator for rental income via Corporate Company structure UK
+Simple yield calculator for rental income via Corporate Company structure UK (based on Interest Only mortgage)
